@@ -1,0 +1,43 @@
+<h2>Productos</h2>
+<a href="/productos/nuevo" class="btn btn-nuevo mb-3">➕ Nuevo Producto</a>
+
+<h2 class="text-center mb-4" style="color: #e91e63;">🛍️ Nuestros Productos</h2>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+  {{#each productos}}
+ <div class="col">
+  <div class="card h-100 shadow-sm">
+<div class="img-wrapper">
+  <img src="{{#if this.imagen}}{{this.imagen}}{{else}}/img/no-image.png{{/if}}"
+       class="card-img-top img-fluid"
+       alt="{{this.nombre}}">
+</div>
+
+    <div class="card-body d-flex flex-column justify-content-between">
+      <div>
+        <h5 class="card-title" style="color: #e91e63;">{{this.nombre}}</h5>
+        <p class="card-text">{{this.descripcion}}</p>
+        <p class="fw-bold">$ {{this.precio}}</p>
+      </div>
+
+      <div class="d-grid gap-2 mt-3">
+        <a href="/productos/editar/{{this._id}}" class="btn btn-editar btn-sm">Editar</a>
+
+<form action="/productos/eliminar/{{this._id}}" method="POST"
+      onsubmit="return confirm('¿Estás seguro que querés eliminar este producto?')">
+  <button class="btn btn-eliminar btn-sm w-100">Eliminar</button>
+</form>
+
+
+        <button class="btn btn-nuevo btn-sm agregar-carrito w-100 mt-1"
+          data-nombre="{{this.nombre}}"
+          data-precio="{{this.precio}}">
+          Agregar al carrito
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  {{/each}}
+</div>

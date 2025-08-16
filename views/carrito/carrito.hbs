@@ -1,0 +1,136 @@
+<h2 class="text-center mb-4" style="color:#e91e63;">🛍️ Tu carrito</h2>
+
+<div class="table-responsive" style="max-width: 900px; margin: 0 auto;">
+  <table class="table table-custom" id="tabla-carrito">
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Precio</th>
+        <th>Total</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3" class="text-end fw-bold">Total:</td>
+        <td id="total-final" class="fw-bold text-success">$0</td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+
+<div class="text-center mt-4">
+  <button id="confirmar-carrito" class="btn btn-nuevo me-2">✅ Confirmar compra</button>
+  <button id="vaciar-carrito" class="btn btn-eliminar">🗑️ Vaciar carrito</button>
+  <a href="/productos" class="btn btn-secondary ms-2">Seguir comprando</a>
+</div>
+
+<!-- Toast container -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+  <div id="toastMsg" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body" id="toast-body-text">Mensaje</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const carritoKey = "carritoDelfina";
+  const carrito = JSON.parse(localStorage.getItem(carritoKey)) || [];
+
+  const tbody = document.querySelector("#tabla-carrito tbody");
+  const totalFinal = document.querySelector("#total-final");
+
+  function renderCarrito() {
+    tbody.innerHTML = "";
+    let total = 0;
+
+    if (carrito.length === 0) {
+      const fila = document.createElement("tr");
+      fila.innerHTML = `<td colspan="4" class="text-center text-muted">Tu carrito está vacío.</td>`;
+      tbody.appendChild(fila);
+      totalFinal.textContent = "$0";
+      return;
+    }
+
+ carrito.forEach((item, index) => {
+  const subtotal = item.precio * item.cantidad;
+  total += subtotal;
+
+  const fila = document.createElement("tr");
+  fila.innerHTML = `
+    <td>${item.nombre}</td>
+    <td>${item.cantidad}</td>
+    <td>$${item.precio}</td>
+    <td>$${subtotal}</td>
+    <td>
+      <button class="btn btn-sm btn-eliminar-detalle" data-index="${index}">🗑️</button>
+    </td>
+  `;
+  tbody.appendChild(fila);
+});
+
+
+    totalFinal.textContent = `$${total}`;
+  }
+
+  renderCarrito();
+  activarBotonesEliminar();
+
+function activarBotonesEliminar() {
+  const botonesEliminar = document.querySelectorAll(".btn-eliminar-detalle");
+  botonesEliminar.forEach(boton => {
+    boton.addEventListener("click", () => {
+      const index = parseInt(boton.dataset.index);
+      carrito.splice(index, 1);
+      localStorage.setItem(carritoKey, JSON.stringify(carrito));
+      renderCarrito();
+            actualizarContadorCarrito(); 
+    });
+  });
+}
+
+
+  document.querySelector("#confirmar-carrito").addEventListener("click", async () => {
+    if (carrito.length === 0) return mostrarToast("⚠️ El carrito está vacío", "warning");
+
+    const response = await fetch("/carrito/confirmar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(carrito)
+    });
+
+    const resultado = await response.json();
+    mostrarToast("✅ Compra confirmada");
+
+    setTimeout(() => {
+      localStorage.removeItem(carritoKey);
+      location.href = "/productos";
+    }, 2000);
+  });
+
+  document.querySelector("#vaciar-carrito").addEventListener("click", () => {
+    if (confirm("¿Estás seguro de que querés vaciar el carrito?")) {
+      mostrarToast("🗑️ Carrito vaciado", "danger");
+      setTimeout(() => {
+        localStorage.removeItem(carritoKey);
+        location.reload();
+      }, 2000);
+    }
+  });
+
+  // Función para mostrar toast visual
+  function mostrarToast(mensaje, tipo = 'success') {
+    const toastEl = document.getElementById('toastMsg');
+    const toastBody = document.getElementById('toast-body-text');
+
+    toastEl.className = `toast align-items-center text-white bg-${tipo} border-0`;
+    toastBody.textContent = mensaje;
+
+    const toast = new bootstrap.Toast(toastEl);
+    toast.show();
+  }
+</script>
