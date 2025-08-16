@@ -5,12 +5,13 @@ const User = require('../models/user.model');
 const signToken = (payload) => jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
 
 const setAuthCookie = (res, token) => {
-  res.cookie('token', token, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: false,          // ⬅ en prod poné true (https)
-    maxAge: 7 * 24 * 60 * 60 * 1000
-  });
+const isProd = process.env.NODE_ENV === 'production';
+res.cookie('token', token, {
+  httpOnly: true,
+  sameSite: isProd ? 'none' : 'lax',
+  secure:   isProd,
+  maxAge: 7*24*60*60*1000
+});
 };
 
 exports.register = async (req, res) => {
