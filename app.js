@@ -14,15 +14,15 @@ const app = express();
 // Render corre detrás de proxy
 app.set('trust proxy', 1);
 
-// ---- CORS seguro (front en Vercel + dev local) ----
 const allowedOrigins = [
-  process.env.FRONTEND_URL,      // ej: https://tu-front.vercel.app
-  'https://delfina-store-front.vercel.app/'
+  process.env.FRONTEND_URL,             // p.ej. https://delfina-store-front.vercel.app
+  'http://localhost:5173',
+  'https://delfina-store-front.vercel.app' // por si acaso, sin barra final
 ].filter(Boolean);
 
 app.use(cors({
   origin: (origin, cb) => {
-    // permitir requests sin origin (curl, Postman) y orígenes whitelist
+    // permitir Postman/cURL (sin Origin) y orígenes válidos
     if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
     return cb(new Error('CORS bloqueado para ' + origin));
   },
