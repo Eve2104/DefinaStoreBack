@@ -17,7 +17,7 @@ app.set('trust proxy', 1);
 // ---- CORS seguro (front en Vercel + dev local) ----
 const allowedOrigins = [
   process.env.FRONTEND_URL,      // ej: https://tu-front.vercel.app
-  'http://localhost:5173'
+  'https://delfina-store-front.vercel.app/'
 ].filter(Boolean);
 
 app.use(cors({
