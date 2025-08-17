@@ -17,7 +17,8 @@ app.set('trust proxy', 1);
 const allowedOrigins = [
   process.env.FRONTEND_URL,             // p.ej. https://delfina-store-front.vercel.app
   'http://localhost:5173',
-  'https://delfina-store-front.vercel.app' // por si acaso, sin barra final
+  'https://delfina-store-front.vercel.app',
+  'https://delfina-store-front-57fs8dbe6-delfinastores-projects.vercel.app/' // por si acaso, sin barra final
 ].filter(Boolean);
 
 app.use(cors({
